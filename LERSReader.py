@@ -3,6 +3,11 @@
 #@file: LERSReader.py
 #@brief: Reads File Data in LERS Format and Processes
 
+def Prompt():
+    filename = ""
+    while filename == "":
+        filename = input('Enter a Filename: ')
+
 
 #@Brief: Reads a file give a name fot that file
 #@Pre: File name
@@ -20,7 +25,7 @@ def Read(filename):
 def FindNumberOfAttributes(Data):
     attributes = 0
     for char in Data:
-        if char == 'a'
+        if char ! = "d"
         attributes += 1
         else
         continue
@@ -31,5 +36,5 @@ def FindNumberOfAttributes(Data):
 #@Return:
 def ParseData(Data):
     AttributeNo = FindNumberOfAttributes(Data[1])
-    noEntries = len(data)-2
-    DATASET = [[0 for x in range(AttributeNo)]for y in range(noEntries)]
+    noEntries = len(Data)-2
+    DATASET = [[0 for x in range(AttributeNo+1)]for y in range(noEntries)]
