@@ -1,4 +1,5 @@
 from DataParser import DataParser
+from DataSet import DataSet
 
 class AQ(object):
 
@@ -23,13 +24,13 @@ class AQ(object):
 
     # Calculates if a given complex covers a Star.
     # This Method Used Intermediately to Calculate Coverings of Partial Stars.
-    def IsCovered(self, IndexOfCase, Star myStar):
+    def IsCovered(self, IndexOfCase, myStar):
         for i in len(myStar.complexes):
             coveredByComplex = True
-            for j in len(DataParser.getattr('NumberOfAttributes')) and coveredByComplex:
-                for k in enumerate(len(myStar.complexes[i]):
+            for j in len(DataSet.getattr('NumberOfAttributes')) and coveredByComplex:
+                for k in len(myStar.complexes[i]):
 
-                    if myStar.complexes[i][k].attrName == DataParser.getattr('AttributeNames')[j] and myStar.complexes[i][k].negValue == DataParser.getattr('dataTable')[IndexOfCase][j]:
+                    if myStar.complexes[i][k].attrName == DataSet.getattr('AttributeNames')[j] and myStar.complexes[i][k].negValue == DataSet.getattr('dataTable')[IndexOfCase][j]:
                         coveredByComplex = False
 
             if coveredByComplex:
@@ -39,16 +40,16 @@ class AQ(object):
 
     # Finds The Value of a Partial Star
     def CalculatePartialStar(self, PositiveCase, NegativeCases):
-        # TODO: Need to Figure out how to declare class instance in Python!!!!!
-        Star PartialStar
+
+        PartialStar = Star
 
         for i in len(NegativeCases):
             if i == 0 or IsCovered(NegativeCases[i], PartialStar):
-                Star TheStarOfThisCase #TODO: CLASS DECLARATION Python
+                TheStarOfThisCase = Star()
 
-                for j in len(DataParser.getattr('NumberOfAttributes')):
-                    if DataParser.getattr('dataTable')[PositiveCase][j] not DataParser.getattr('dataTable')[NegativeCases[i]][j]:
-                        TheStarOfThisCase.gainsSelector(DataParser.getattr('AttributeNames')[j], DataParser.getattr('dataTable')[NegativeCases[i]][j])
+                for j in len(DataSet.getattr('NumberOfAttributes')):
+                    if DataSet.getattr('dataTable')[PositiveCase][j] is not DataSet.getattr('dataTable')[NegativeCases[i]][j]:
+                        TheStarOfThisCase.gainsSelector(DataSet.getattr('AttributeNames')[j], DataSet.getattr('dataTable')[NegativeCases[i]][j])
 
                 PartialStar = Star(PartialStar, TheStarOfThisCase, False)
             #Debug Statement Could Go Here
@@ -56,13 +57,13 @@ class AQ(object):
 
 
     def ConsistencyCalculator(self):
-        Table = DataParser.getattr('dataTable')
-        Attributes = DataParser.getattr('NumberOfAttributes')
+        Table = DataSet.getattr('dataTable')
+        Attributes = DataSet.getattr('NumberOfAttributes')
         for i in len(Table):
             for j in i:
                 TheAttributesAreIdentical = True
                 for k in Attributes and TheAttributesAreIdentical:
-                    if Table[i][k] not Table[j][k]:
+                    if Table[i][k] is not Table[j][k]:
                         TheAttributesAreIdentical = False
                 if TheAttributesAreIdentical and Table[i][Attributes] is not Table[j][Attributes]:
                     return False
@@ -72,10 +73,9 @@ class AQ(object):
         if not self.getattr('IsConsistent'):
             return
 
-        Concepts = DataParser.getattr('ConceptNames')
+        Concepts = DataSet.getattr('ConceptNames')
 
         for Case in len(Concepts):
-            #PYTHON CLASS DECLARATION AHHH
-            Star ConceptStar
-            PositiveCases = DataParser.getattr('ConceptCases')
+            ConceptStar = Star()
+            PositiveCases = DataSet.getattr('ConceptCases')
             NegativeCases = []
