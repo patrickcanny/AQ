@@ -11,7 +11,7 @@ class Star(object):
         if self.MyBool:
             self.simplify()
 
-    def SimplifyWith(self):
+    def simplify(self):
         for FirstComplex in complexes[0]:
             for SecondComplex in complexes[1]:
                 if set(FirstComplex).issuperset(set(SecondComplex)):
@@ -24,10 +24,11 @@ class Star(object):
         myComplex = list(selector)
         complexes.append(myComplex)
 
-    def reduce(self, MAXSTAR):
-        if len(complexes) > MAXSTAR:
+    def SimplifyWith(self, MAXSTAR):
+        if len(self.complexes) > MAXSTAR:
+            print "Reducing Complex Number with MaxStar"
             complexes = complexes[:MAXSTAR]
 
-    def Concatenate(self, S, mybool = True):
+    def Combine(self, S, mybool = True):
         for Complex in S.complexes:
             complexes.append(Complex)

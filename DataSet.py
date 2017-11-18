@@ -15,7 +15,7 @@ class DataSet(object):
         self.attributeValues = [[],[]]
 
         self.ConceptNames = []
-        self.ConceptCases = [[],[]]
+        self.ConceptCases = []
 
     def __setattr__(self, name, value):
             super(DataSet, self).__setattr__(name, value)
@@ -33,14 +33,9 @@ class DataSet(object):
         self.ConceptNames = list(set(self.dataTable[1]))
 
     def ChangeConceptCases(self):
-        concept = self.ConceptNames[0]
-        iterator = 0
-        for decision in self.dataTable[1]:
-            if decision == concept:
-                self.ConceptCases[0].append(iterator)
-            else:
-                self.ConceptCases[1].append(iterator)
-            iterator += 1
+        for concept in self.ConceptNames:
+            DecisionsAffliated = [i for i, x in enumerate(self.dataTable[1]) if x == concept]
+            self.ConceptCases.append(DecisionsAffliated)
 
     # def Discretize(self):
     #     for i in dataTable[0]
@@ -62,5 +57,3 @@ class DataSet(object):
         print "Decisions For those Cases"
         for row in self.dataTable[1]:
             print row
-
-        print set(self.dataTable[1])
