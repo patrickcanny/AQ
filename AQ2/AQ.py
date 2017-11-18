@@ -7,20 +7,10 @@ class AQ(object):
         super(AQ, self).__init__()
         self.DataParser = DataParser(filename)
         self.DataSet = DataParser.buildTable()
-        self.IsConsistent = ConsistencyCalculator()
+        self.IsConsistent = self.ConsistencyCalculator()
         if IsConsistent:
-            DataParser.Discretize()
-
-    def StripFileName(self, inputString):
-        Dot = False
-        for i in len(inputString):
-            if inputString[i] == '.':
-                Dot = True
-                break
-            if Dot :
-                return s.substr(0,i)
-            else:
-                return s
+            DataSet.Discretize()
+        self.ConceptStars = []
 
     # Calculates if a given complex covers a Star.
     # This Method Used Intermediately to Calculate Coverings of Partial Stars.
@@ -79,3 +69,22 @@ class AQ(object):
             ConceptStar = Star()
             PositiveCases = DataSet.getattr('ConceptCases')
             NegativeCases = []
+            for j in range(len(DataSet.getattr('dataTable'))):
+                isNeg = True
+                for k in PositiveCases:
+                    if j is k:
+                        isNeg = False
+                        break
+                if isNeg:
+                    NegativeCases.append[j]
+        for PositiveCase in PositiveCases:
+            if not isCovered(PositiveCase, ConceptStar):
+                PartialStar = CalculatePartialStar(PositiveCase, NegativeCases)
+                PartialStar.SimplifyWith(MAXSTAR)
+                ConceptStar.Combine(PartialStar, False)
+        self.ConceptStars.append(ConceptStar)
+
+    def WriteRulesWithNegation(self):
+        #TODO: Figure Out File Extension Stuff
+        fileName = "test.wth.negation.rul"
+        
