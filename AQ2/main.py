@@ -23,11 +23,11 @@ while not checkTheFile:
 Parser = DataParser(MyFile)
 
 myData = Parser.Read()
-myData.ChangeConceptNames()
-myData.ChangeConceptCases()
-print "Initializing AQ..."
 
-myAQ = AQ(myData)
+myData.PrintProcessedData()
+
+print "Initializing AQ..."
+myAQ = AQ()
 
 MaxStar = 0
 while MaxStar <= 0:
@@ -39,4 +39,4 @@ print "Ran AQ!"
 myAQ.WriteRulesWithNegation()
 myAQ.WriteRulesWithoutNegation()
 
-print "Thanks!"
+print "Thanks!""
