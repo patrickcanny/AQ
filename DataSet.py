@@ -63,9 +63,43 @@ class DataSet(object):
     #@function Dsicretize
     # If dataset is numerical, this function will convert it to a discretized version
     def Discretize(self):
-        for case in self.dataTable[0]:
-            for attribute in case:
-                DiscretizeAttribute(attribute)
+        index = 0
+        ListOfDescritizableIndexes = []
+        for row in self.dataTable[0]:
+            for attribute in row:
+                try:
+                    #if the indexed value can be converted to a floating point, do it and add to a list of descritazable attributes
+                    float(attribute)
+                    ListOfDescritizableIndexes.append(index)
+
+                except:
+                    continue
+                index += 1
+
+            for i in xrange(len(row)):
+                if i in ListOfDescritizableIndexes:
+                    DiscreteList = []
+                    for row in self.dataTable[0]:
+                            #create a list of all the attributes at index i in each case
+                        DiscreteList.append(row[i])
+                        #created a set in order to remove duplicate values for calculation
+                    DiscreteSet = set(DiscreteList)
+                        #found maximum and minimum values from that set
+                    MaximumAttributeVal = max(DiscreteSet)
+                    MinimumAttributeVal = min(DiscreteSet)
+                    try:
+                        float(MaximumAttributeVal)
+                        float(MinimumAttributeVal)
+                        MeanVal = (MaximumAttributeVal + MinimumAttributeVal)//2
+                    except:
+                        continue
+                    for row in self.dataTable[0]:
+                        if MinimumAttributeVal <= float(row[i]) < MeanVal:
+                            row[i] = str(MinimumAttributeVal)+".."+str(MeanVal)
+                        elif MeanVal <= float(row[i]) <= MaximumAttributeVal :
+                            row[i] = str(MeanVal)+".."+str(MaximumAttributeVal)
+
+
 
     def DiscretizeAttribute(self, AttributeIndex):
         PossibleAttributes = set(self.dataTable[0][AttributeIndex])

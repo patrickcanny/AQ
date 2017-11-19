@@ -39,7 +39,7 @@ print "Initializing AQ..."
 
 #Initializing AQ...
 myAQ = AQ(myData)
-# myAQ.DataSet.PrintProcessedData()
+myAQ.DataSet.PrintProcessedData()
 
 #Get MAXSTAR from the user
 checker = False

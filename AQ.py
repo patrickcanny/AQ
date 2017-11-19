@@ -19,8 +19,8 @@ class AQ(object):
         self.IsConsistent = True
         #Discretizes the data if the data is Consistent
         if self.ConsistencyCalculator():
-            pass
-            # DataSet.Discretize()
+            print "Descritizing"
+            self.DataSet.Discretize()
 
         #List of stars which cover a given concept.
         #Essentially a List of the covers
@@ -178,7 +178,7 @@ class AQ(object):
     # working on figuring out how to transform this to non-negated format
     def WriteRulesWithNegation(self):
         #TODO: Figure Out File Extension Stuff
-        fileName = "datasets/test.wth.negation.rul"
+        fileName = "datasets/my-data.with.negation.rul"
         with open(fileName, 'w') as output:
             for i in xrange(0, len(self.DataSet.ConceptNames)):
                 for _complex in self.ConceptStars[i].complexes:

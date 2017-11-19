@@ -3,4 +3,4 @@ run:
 
 clean:
 	rm *.pyc
-	rm datasets/*.wth.negation.rul
+	rm datasets/*.with.negation.rul
