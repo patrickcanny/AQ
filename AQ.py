@@ -158,6 +158,20 @@ class AQ(object):
         print self.ConceptStars[0].complexes
         print self.ConceptStars[1].complexes
 
+    def PrintComplexAsRuleNegated(self, _complex):
+        rule = ""
+        ConditionsInRule = 0
+
+        for entry in _complex:
+            for condition in entry:
+                NotCondition = entry[1].replace("!", "")
+            rule +=  "(" + str(entry[0]) + ", not "  + str(NotCondition) +  ")"
+            ConditionsInRule += 1
+            if len(_complex) != ConditionsInRule:
+                rule += " & "
+        return rule
+
+
 
     # @function WriteRulesWithNegation
     # Writes the rules to a file in negated format
@@ -169,6 +183,6 @@ class AQ(object):
             for i in xrange(0, len(self.DataSet.ConceptNames)):
                 for _complex in self.ConceptStars[i].complexes:
                     decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[i])
-                    print str(_complex)+ " ----> " + str(decisionTuple)
-                    output.write(str(_complex)+ " ----> " + str(decisionTuple)+"\n")
+                    print self.PrintComplexAsRuleNegated(_complex) + " ----> " + str(decisionTuple)
+                    output.write(self.PrintComplexAsRuleNegated(_complex)+ " ----> " + str(decisionTuple)+"\n")
         return

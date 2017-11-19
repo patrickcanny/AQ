@@ -62,8 +62,17 @@ class DataSet(object):
 
     #@function Dsicretize
     # If dataset is numerical, this function will convert it to a discretized version
-    # def Discretize(self):
-    #     for i in dataTable[0]
+    def Discretize(self):
+        for case in self.dataTable[0]:
+            for attribute in case:
+                DiscretizeAttribute(attribute)
+
+    def DiscretizeAttribute(self, AttributeIndex):
+        PossibleAttributes = set(self.dataTable[0][AttributeIndex])
+
+
+
+
 
     #@function PrintProcessedData
     # Debugging tool that prints the attributes affiliated with a dataset object
