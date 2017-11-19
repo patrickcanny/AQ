@@ -32,20 +32,26 @@ class AQ(object):
 
     # Finds The Value of a Partial Star
     def CalculatePartialStar(self, PositiveCase, NegativeCases):
-        print "Calculating Partial Star..."
+        # print "Calculating Partial Star..."
         PartialStar = Star()
 
         for NegativeCase in NegativeCases:
-            if not NegativeCase or self.IsCovered(NegativeCase, PartialStar):
-                TheStarOfThisCase = Star()
+            TheStarOfThisCase = Star()
+            NegValues = getattr(self.DataSet, 'dataTable')[0][NegativeCase]
+            # print "Selector:"+ str(NegativeCase) + str(NegValues)
 
-                for j in range(0, len(getattr(self.DataSet, 'NumberOfAttributes'))):
-                    if getattr(self.DataSet, 'dataTable')[PositiveCase][j] is not getattr(self.DataSet, 'dataTable')[NegativeCases[i]][j]:
-                        TheStarOfThisCase.gainsSelector(getattr(self.DataSet, 'AttributeNames')[j], getattr(self.DataSet, 'dataTable')[NegativeCases[i]][j])
-
-                PartialStar = Star(PartialStar, TheStarOfThisCase, False)
-        print "PartialStar Complexes: "
-        print PartialStar.complexes
+            dif = set(NegValues).difference(set(PositiveCase))
+            # print "Differences in Seed and Case: " + str(dif)
+            for value in dif:
+                position = NegValues.index(value)
+                attribute = getattr(self.DataSet, 'AttributeNames')[position]
+                TheStarOfThisCase.addSelector(attribute, "!"+str(value))
+                NewComplexes = set(TheStarOfThisCase.complexes).union(set(PartialStar.complexes))
+                PartialStar.complexes = list(NewComplexes)
+        # print "Case Star Complexes"
+        # print TheStarOfThisCase.complexes
+        # print "PartialStar Complexes: "
+        # print PartialStar.complexes
         return PartialStar
 
 
@@ -71,37 +77,53 @@ class AQ(object):
 
         Concepts = getattr(self.DataSet, 'ConceptNames')
         i = 0
-        
+
         for Concept in Concepts:
             print "Starting New Concept..."
             ConceptStar = Star()
+
             PositiveCases = getattr(self.DataSet, 'ConceptCases')
             joined = list(itertools.chain.from_iterable(PositiveCases))
+
             NegativeCaseSet = set(joined).difference(set(PositiveCases[i]))
             NegativeCase = list(NegativeCaseSet)
-            print "Positive Cases"
-            print PositiveCases[i]
-            print "Negative Case:"
-            print NegativeCase
+
+            #Debugging Tool
+            # print "Positive Cases"
+            # print PositiveCases[i]
+            # print "Negative Case:"
+            # print NegativeCase
 
             for PositiveCase in PositiveCases[i]:
-                print "Case in Question: " + str(PositiveCase)
-                print "Case Values: " + str(getattr(self.DataSet, 'dataTable')[0][PositiveCase])
+                #Debugging Tool
+                # print "Seed: " + str(PositiveCase) + str(getattr(self.DataSet, 'dataTable')[0][PositiveCase])
+
                 caseValues = getattr(self.DataSet, 'dataTable')[0][PositiveCase]
                 if not self.IsCovered(PositiveCase, ConceptStar):
+
                     PartialStar = self.CalculatePartialStar(caseValues, NegativeCase)
+
                     PartialStar.SimplifyWith(MAXSTAR)
+
                     ConceptStar.Combine(PartialStar, False)
+
                     self.ConceptStars.append(ConceptStar)
+
                 else:
                     print "Case already covered!"
             i+=1
+        print self.ConceptStars[0].complexes
+        print self.ConceptStars[1].complexes
 
 
-    # def WriteRulesWithNegation(self):
-    #     #TODO: Figure Out File Extension Stuff
-    #     fileName = "test.wth.negation.rul"
-    #     with open(filename, 'w') as output:
-    #         for concept in range(0, len(ConceptNames)):
-    #             for Star in ConceptStars[concept].len(complexes):
-    #                 for Selector in
+    def WriteRulesWithNegation(self):
+        #TODO: Figure Out File Extension Stuff
+        fileName = "datasets/test.wth.negation.rul"
+        with open(fileName, 'w') as output:
+            for i in xrange(0, len(self.DataSet.ConceptNames)):
+                for _complex in self.ConceptStars[i].complexes:
+                    print str(_complex)
+                    decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[i])
+                    print str(_complex)+ " ----> " + str(decisionTuple)
+                    output.write(str(_complex)+ " ----> " + str(decisionTuple)+"\n")
+        return

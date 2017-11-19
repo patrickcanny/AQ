@@ -28,6 +28,7 @@ myData.ChangeConceptCases()
 print "Initializing AQ..."
 
 myAQ = AQ(myData)
+# myAQ.DataSet.PrintProcessedData()
 
 MaxStar = 0
 while MaxStar <= 0:
@@ -37,6 +38,6 @@ myAQ.runAQ(MaxStar)
 print "Ran AQ!"
 
 myAQ.WriteRulesWithNegation()
-myAQ.WriteRulesWithoutNegation()
+# myAQ.WriteRulesWithoutNegation()
 
 print "Thanks!"

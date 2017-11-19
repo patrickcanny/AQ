@@ -5,30 +5,34 @@ class Star(object):
         self.MyBool = _bool
         self.PartialStar = PartialStar
         self.OtherStar = OtherStar
-        if PartialStar and OtherStar:
-            myset = set(PartialStar.complexes).union(set(OtherStar.complexes))
-            self.complexes = list(myset)
-        if self.MyBool:
-            self.simplify()
+        # if PartialStar and OtherStar:
+        #     PartialSet = set(PartialStar.complexes)
+        #     OtherSet = set(OtherStar.complexes)
+        #     myset = PartialSet.union(OtherSet)
+        #     self.complexes = list(myset)
+        # if self.MyBool:
+        #     self.simplify()
+
+    def Star(self, PartialStar, OtherStar, boolean):
+        PartialSet = set(getattr(PartialStar, 'complexes'))
+        OtherSet = set(getattr(OtherStar, 'complexes'))
+        myset = PartialSet.union(OtherSet)
+        self.complexes = list(myset)
 
     def simplify(self):
-        for FirstComplex in complexes[0]:
-            for SecondComplex in complexes[1]:
-                if set(FirstComplex).issuperset(set(SecondComplex)):
-                    pass#Remove Redundant complexes
-                elif set(SecondComplex).issuperset(FirstComplex):
-                    pass#Remove Redundant
+        newcomplexes = list(set(self.complexes))
+        self.complexes = newcomplexes
 
     def addSelector(self, AttributeName, NegativeValue):
         selector = (AttributeName, NegativeValue)
-        myComplex = list(selector)
-        complexes.append(myComplex)
+        if selector not in self.complexes:
+            self.complexes.append(selector)
 
     def SimplifyWith(self, MAXSTAR):
         if len(self.complexes) > MAXSTAR:
             print "Reducing Complex Number with MaxStar"
-            complexes = complexes[:MAXSTAR]
+            self.complexes = self.complexes[:MAXSTAR]
 
     def Combine(self, S, mybool = True):
         for Complex in S.complexes:
-            complexes.append(Complex)
+            self.complexes.append(Complex)
