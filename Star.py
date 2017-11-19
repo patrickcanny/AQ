@@ -2,6 +2,7 @@ class Star(object):
     def __init__(self, PartialStar=None, OtherStar=None , _bool=None):
         super(Star, self).__init__()
         self.complexes = []
+        self.covers = []
         self.MyBool = _bool
         self.PartialStar = PartialStar
         self.OtherStar = OtherStar
@@ -16,12 +17,17 @@ class Star(object):
     def Star(self, PartialStar, OtherStar, boolean):
         PartialSet = set(getattr(PartialStar, 'complexes'))
         OtherSet = set(getattr(OtherStar, 'complexes'))
-        myset = PartialSet.union(OtherSet)
-        self.complexes = list(myset)
+        PossibleCover = []
+        for AV in PartialSet:
+            PossibleCover.append(AV)
+
 
     def simplify(self):
-        newcomplexes = list(set(self.complexes))
-        self.complexes = newcomplexes
+        new_complexes = []
+        for elem in self.complexes:
+            if elem not in new_complexes:
+                new_complexes.append(elem)
+        self.complexes = list(new_complexes)
 
     def addSelector(self, AttributeName, NegativeValue):
         selector = (AttributeName, NegativeValue)
