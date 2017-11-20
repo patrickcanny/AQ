@@ -61,6 +61,8 @@ while not checker:
 myAQ.runAQ(MaxStar)
 print "Ran AQ!"
 
+myAQ.SimplifyRuleSet()
+
 #Write all the rules from AQ to the required files
 myAQ.WriteRulesWithNegation()
 myAQ.WriteRulesWithoutNegation()

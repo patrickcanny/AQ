@@ -15,6 +15,8 @@ class AQ(object):
         #DataSet used in the AQ algorithm
         self.DataSet = DataSet
 
+        self.MAXSTAR = 0
+
         #Flag for Consistency of the DataSet
         self.IsConsistent = True
         #Discretizes the data if the data is Consistent
@@ -29,16 +31,16 @@ class AQ(object):
     # Calculates if a given complex covers a Star.
     # This Method Used Intermediately to Calculate Coverings of Partial Stars.
     def IsCovered(self, IndexOfComplex, myStar):
-        print "checking coverage of "+ str(myStar.complexes) + " by index "+str(IndexOfComplex)
+        # print "checking coverage of "+ str(myStar.complexes) + " by index "+str(IndexOfComplex)
         for _complex in myStar.complexes:
             coveredByComplex = True;
             for j in xrange(0, len(self.DataSet.AttributeNames)):
                 for k in xrange(0, len(_complex)):
-                    print _complex[k]
+                    # print _complex[k]
                     if _complex[k][0] == self.DataSet.AttributeNames[j] and _complex[k][1] == "!"+str(self.DataSet.AttributeNames[j]):
                         coveredByComplex = False
             if coveredByComplex:
-                print "Index " + str(IndexOfComplex)+ " is covered!"
+                # print "Index " + str(IndexOfComplex)+ " is covered!"
                 return True
             print "No Coverage, appending case"
             return False
@@ -60,14 +62,15 @@ class AQ(object):
             if dif[i] != " ":
                 TheStarOfThisCase.addSelector(attribute, "!"+str(dif[i]))
             else:
-                print str(getattr(self.DataSet, 'AttributeNames')[position] ) + " value is shared between cases"
+                continue
+                # print str(getattr(self.DataSet, 'AttributeNames')[position] ) + " value is shared between cases"
         return TheStarOfThisCase
 
     # @function CalculatePartialStar
     # Finds The Value of a Partial Star, and returns that star as a Star object
     def CalculatePartialStar(self, seed, NegativeCases):
-        print ""
-        print "Calculating Partial Star..."
+        # print ""
+        # print "Calculating Partial Star..."
         PartialStar = Star()
 
         i = 0
@@ -80,14 +83,16 @@ class AQ(object):
                 dif = self.findDifferences(seed, NegValues)
                 TheStarOfThisCase = self.StarForACase(dif)
 
-                print "Selector" + str(i)
-                print TheStarOfThisCase.complexes
+                # print "Selector" + str(i)
+                # print TheStarOfThisCase.complexes
                 PartialStar.complexes.append(TheStarOfThisCase.complexes)
-                print "Updated Partial Star"
+                # print "Updated Partial Star"
                 PartialStar.simplify()
-                print PartialStar.complexes
+                PartialStar.SimplifyWith(self.MAXSTAR)
+                # print PartialStar.complexes
             else:
-                print "Case " + str(NegativeCase) + " is already covered!"
+                continue
+                # print "Case " + str(NegativeCase) + " is already covered!"
         return PartialStar
 
 
@@ -114,6 +119,7 @@ class AQ(object):
     # For every concept, the algorithm will generate a cover, appending that cover to ConceptStars
     # This is done through generation and comparison of partial stars.
     def runAQ(self, MAXSTAR):
+        self.MAXSTAR = MAXSTAR
         if not self.IsConsistent:
             return
 
@@ -121,9 +127,9 @@ class AQ(object):
         i = 0
 
         for Concept in Concepts:
-            print ""
-            print""
-            print "Starting New Concept..."
+            # print ""
+            # print""
+            # print "Starting New Concept..."
             ConceptStar = Star()
 
             PositiveCases = getattr(self.DataSet, 'ConceptCases')
@@ -140,13 +146,13 @@ class AQ(object):
 
             for PositiveCase in PositiveCases[i]:
                 #Debugging Tool
-                print "Seed: " + str(PositiveCase) + str(getattr(self.DataSet, 'dataTable')[0][PositiveCase])
+                # print "Seed: " + str(PositiveCase) + str(getattr(self.DataSet, 'dataTable')[0][PositiveCase])
 
                 seed = getattr(self.DataSet, 'dataTable')[0][PositiveCase]
                 if not self.IsCovered(PositiveCase, ConceptStar):
 
                     PartialStar = self.CalculatePartialStar(seed, NegativeCase)
-                    PartialStar.SimplifyWith(MAXSTAR)
+                    # PartialStar.SimplifyWith(MAXSTAR)
                     ConceptStar.Combine(PartialStar, False)
                     self.ConceptStars.append(ConceptStar)
 
@@ -154,8 +160,26 @@ class AQ(object):
                     pass
                     # print "Case already covered!"
             i+=1
+        # DEBUG
         print self.ConceptStars[0].complexes
         print self.ConceptStars[1].complexes
+
+
+    def SimplifyRuleSet(self):
+        print "Simplifying..."
+        for Concept in self.ConceptStars:
+            for item in Concept.complexes:
+                for otherItem in Concept.complexes:
+                    if len(item) > len(otherItem):
+                        for condition in item:
+                            for othercondition in otherItem:
+                                if condition == othercondition:
+                                    try:
+                                        Concept.complexes.remove(item)
+                                    except:
+                                        continue
+
+
 
     def PrintComplexAsRuleNegated(self, _complex):
         rule = ""
@@ -192,15 +216,6 @@ class AQ(object):
                     ConditionsInRule.append(ReversedCondition)
         return ConditionsInRule
 
-    def NonNegatedRuleGenerator(self, ruleList, index):
-        for rule in ruleList:
-            for otherRule in ruleList:
-                if rule[0] != otherRule[0]: #if the two rules are affiliated with different attributes
-                    for condition in rule:
-                        if condition != rule[0]:
-                            decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[index])
-                            RuleAsString = "(" + str(rule[0]) + "," + str(condition) + ")" + " & " + "(" + str(otherRule[0]) + "," + str(condition) + ")" + "&"
-                            return RuleAsString
 
 
     def WriteRulesWithoutNegation(self):

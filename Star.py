@@ -40,6 +40,7 @@ class Star(object):
             self.complexes.append(selector)
 
     def SimplifyWith(self, MAXSTAR):
+        print "Hit SimplifyWithMaxstar"
         if len(self.complexes) > MAXSTAR:
             print "Reducing Complex Number with MaxStar"
             self.complexes = self.complexes[:MAXSTAR]
