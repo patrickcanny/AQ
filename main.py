@@ -35,6 +35,7 @@ Parser = DataParser(MyFile)
 myData = Parser.Read()
 myData.ChangeConceptNames()
 myData.ChangeConceptCases()
+myData.ChangeAttributeValues()
 print "Initializing AQ..."
 
 #Initializing AQ...
@@ -62,6 +63,6 @@ print "Ran AQ!"
 
 #Write all the rules from AQ to the required files
 myAQ.WriteRulesWithNegation()
-# myAQ.WriteRulesWithoutNegation()
+myAQ.WriteRulesWithoutNegation()
 
 print "Thanks!"

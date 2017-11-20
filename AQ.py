@@ -19,7 +19,6 @@ class AQ(object):
         self.IsConsistent = True
         #Discretizes the data if the data is Consistent
         if self.ConsistencyCalculator():
-            print "Descritizing"
             self.DataSet.Discretize()
 
         #List of stars which cover a given concept.
@@ -171,7 +170,53 @@ class AQ(object):
                 rule += " & "
         return rule
 
+    #Takes a Complex
+    #Inverts the Rules affiliated with that complex
+    def PrintComplexAsRuleNotNegated(self, _complex):
+        rule = ""
+        NumConditionsInRule = 0
+        print "Checking Complex: " + str(_complex)
+        ConditionsInRule = []
 
+        for entry in _complex:
+            NegSet = list(set(entry).difference(set(self.DataSet.AttributeNames)))
+            NewSet = []
+            print "Entry Being Checked: " + str(entry)
+            for condition in NegSet:
+                condition = condition.replace("!", "")
+                NewSet.append(condition)
+            NegSet = NewSet
+
+            print "Checking Attribute: " + str(entry[0])
+            for AV in self.DataSet.attributeValues:
+                if AV[0] == entry[0]:
+                    ReversedCondition = set(AV[1]).difference(set(NegSet))
+                    ConditionsInRule.append(list(ReversedCondition))
+
+            print "Conditions in Rule: " + str(ConditionsInRule)
+
+            i = 0
+            for ListOfAttribueValues in ConditionsInRule:
+                if i > len(ListOfAttribueValues):
+                    break
+                else:
+                    for j in xrange(0, len(ListOfAttribueValues)):
+                        rule += "(" + str(entry[0]) + ", " + str(ListOfAttribueValues[j]) + ")"
+                        rule += " & "
+                i+=1
+        return rule
+
+
+    def WriteRulesWithoutNegation(self):
+        fileName = "datasets/my-data.without.negation.rul"
+        with open(fileName, 'w') as output:
+            for i in xrange(len(self.DataSet.ConceptNames)):
+                for _complex in self.ConceptStars[i].complexes:
+                    decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[i])
+                    print self.PrintComplexAsRuleNotNegated(_complex) + "->" + str(decisionTuple)
+                    output.write(self.PrintComplexAsRuleNotNegated(_complex) + "->" + str(decisionTuple) + "\n")
+        print "Non-Negated Rules Complete!"
+        return
 
     # @function WriteRulesWithNegation
     # Writes the rules to a file in negated format
@@ -183,6 +228,7 @@ class AQ(object):
             for i in xrange(0, len(self.DataSet.ConceptNames)):
                 for _complex in self.ConceptStars[i].complexes:
                     decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[i])
-                    print self.PrintComplexAsRuleNegated(_complex) + " ----> " + str(decisionTuple)
-                    output.write(self.PrintComplexAsRuleNegated(_complex)+ " ----> " + str(decisionTuple)+"\n")
+                    print self.PrintComplexAsRuleNegated(_complex) + " -> " + str(decisionTuple)
+                    output.write(self.PrintComplexAsRuleNegated(_complex)+ " -> " + str(decisionTuple)+"\n")
+        print "Negated Rules Complete!"
         return

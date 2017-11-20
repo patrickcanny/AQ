@@ -25,7 +25,9 @@ class DataSet(object):
         #   Second Index: Each Decision affiliated with a corresponding case.
         #                           The index of decsion will be identical to index of corresponding case
         self.dataTable = [[],[]]
-        self.attributeValues = [[],[]]
+
+        #Holds possible attribute values for each attribute studied
+        self.attributeValues = []
 
         #List of the names of each concept
         self.ConceptNames = []
@@ -59,6 +61,15 @@ class DataSet(object):
         for concept in self.ConceptNames:
             DecisionsAffliated = [i for i, x in enumerate(self.dataTable[1]) if x == concept]
             self.ConceptCases.append(DecisionsAffliated)
+
+    def ChangeAttributeValues(self):
+        for i in xrange(0, len(self.AttributeNames)):
+            ListOfPossibleAttributeValues = []
+            for row in self.dataTable[0]:
+                if row[i] not in ListOfPossibleAttributeValues:
+                    ListOfPossibleAttributeValues.append(row[i])
+            ValueToAppend = (self.AttributeNames[i], ListOfPossibleAttributeValues)
+            self.attributeValues.append(ValueToAppend)
 
     #@function Dsicretize
     # If dataset is numerical, this function will convert it to a discretized version
@@ -101,13 +112,6 @@ class DataSet(object):
 
 
 
-    def DiscretizeAttribute(self, AttributeIndex):
-        PossibleAttributes = set(self.dataTable[0][AttributeIndex])
-
-
-
-
-
     #@function PrintProcessedData
     # Debugging tool that prints the attributes affiliated with a dataset object
     def PrintProcessedData(self):
@@ -119,6 +123,9 @@ class DataSet(object):
 
         print "Attribute Names: "
         print self.AttributeNames
+
+        print "Attribute Values"
+        print self.attributeValues
 
         print "Cases: "
         for row in self.dataTable[0]:

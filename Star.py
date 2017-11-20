@@ -18,8 +18,13 @@ class Star(object):
         PartialSet = set(getattr(PartialStar, 'complexes'))
         OtherSet = set(getattr(OtherStar, 'complexes'))
         PossibleCover = []
-        for AV in PartialSet:
-            PossibleCover.append(AV)
+        if PartialSet.issubset(OtherSet):
+            print "PartialStat is a Subset of OtherStar!"
+            return
+        else:
+            for AV in PartialSet:
+                if AV not in PartialSet:
+                    PossibleCover.append(AV)
 
 
     def simplify(self):
