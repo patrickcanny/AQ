@@ -45,6 +45,24 @@ class Star(object):
             print "Reducing Complex Number with MaxStar"
             self.complexes = self.complexes[:MAXSTAR]
 
-    def Combine(self, S, mybool = True):
-        for Complex in S.complexes:
-            self.complexes.append(Complex)
+    def Combine(self, PartialStar):
+        # self.complexes.append(PartialStar.complexes)
+        newlist = []
+        for entry in PartialStar.complexes:
+            #  print "entry: " + str(entry)
+
+
+            for otherentry in self.complexes:
+                for thingToAppend in otherentry:
+                    templist = []
+                    templist.append(entry)
+                    # print "This is what is being combined with entry: " + str(thingToAppend)
+                    if thingToAppend != entry:
+                        templist.append(thingToAppend)
+                    else:
+                        pass
+                    # print "New Rule: " + str(templist)
+                    newlist.append(templist)
+        # print str(newlist)
+        self.complexes = newlist
+        print "Combined, new Star Complex List: " + str(self.complexes)

@@ -68,31 +68,22 @@ class AQ(object):
 
     # @function CalculatePartialStar
     # Finds The Value of a Partial Star, and returns that star as a Star object
-    def CalculatePartialStar(self, seed, NegativeCases):
-        # print ""
-        # print "Calculating Partial Star..."
+    def CalculatePartialStar(self, seed, NegativeCase):
+        print ""
+        print "Calculating Partial Star..."
+
         PartialStar = Star()
 
-        i = 0
-        for NegativeCase in NegativeCases:
-            if i ==0 or (self.IsCovered(NegativeCase, PartialStar) == True):
-                TheStarOfThisCase = Star()
-                NegValues = getattr(self.DataSet, 'dataTable')[0][NegativeCase]
-                # print "Selector:"+ str(NegativeCase) + str(NegValues)
+        NegValues = getattr(self.DataSet, 'dataTable')[0][NegativeCase]
+        print "Selector: "+ str(NegativeCase)
 
-                dif = self.findDifferences(seed, NegValues)
-                TheStarOfThisCase = self.StarForACase(dif)
+        dif = self.findDifferences(seed, NegValues)
+        PartialStar = self.StarForACase(dif)
 
-                # print "Selector" + str(i)
-                # print TheStarOfThisCase.complexes
-                PartialStar.complexes.append(TheStarOfThisCase.complexes)
-                # print "Updated Partial Star"
-                PartialStar.simplify()
-                PartialStar.SimplifyWith(self.MAXSTAR)
-                # print PartialStar.complexes
-            else:
-                continue
-                # print "Case " + str(NegativeCase) + " is already covered!"
+        print "PartialStar for seed " +str(seed) +" is: " + str(PartialStar.complexes)
+
+        # else:
+            # print "Case " + str(NegativeCase) + " is already covered!"
         return PartialStar
 
 
@@ -130,13 +121,13 @@ class AQ(object):
             # print ""
             # print""
             # print "Starting New Concept..."
-            ConceptStar = Star()
+            # ConceptStar = Star()
 
             PositiveCases = getattr(self.DataSet, 'ConceptCases')
             joined = list(itertools.chain.from_iterable(PositiveCases))
 
             NegativeCaseSet = set(joined).difference(set(PositiveCases[i]))
-            NegativeCase = list(NegativeCaseSet)
+            NegativeCases = list(NegativeCaseSet)
 
             #Debugging Tool
             # print "Positive Cases"
@@ -145,19 +136,31 @@ class AQ(object):
             # print NegativeCase
 
             for PositiveCase in PositiveCases[i]:
+                ConceptStar = Star()
                 #Debugging Tool
                 # print "Seed: " + str(PositiveCase) + str(getattr(self.DataSet, 'dataTable')[0][PositiveCase])
 
                 seed = getattr(self.DataSet, 'dataTable')[0][PositiveCase]
-                if not self.IsCovered(PositiveCase, ConceptStar):
+                for NegativeCase in NegativeCases:
+                    if not self.IsCovered(PositiveCase, ConceptStar):
 
-                    PartialStar = self.CalculatePartialStar(seed, NegativeCase)
-                    # PartialStar.SimplifyWith(MAXSTAR)
-                    ConceptStar.Combine(PartialStar, False)
-                    self.ConceptStars.append(ConceptStar)
+                        PartialStar = self.CalculatePartialStar(seed, NegativeCase)
+                        PartialStar.SimplifyWith(MAXSTAR)
 
-                else:
-                    pass
+                        if len(ConceptStar.complexes) == 0:
+                            print "Current Cover is Empty, adding the Partial Star"
+                            ConceptStar.complexes.append(PartialStar.complexes)
+
+                        else:
+                            print "This is Where Combination of Stars Occurs"
+                            ConceptStar.Combine(PartialStar)
+
+                        print "Adding a Star to The Cover"
+                        self.ConceptStars.append(ConceptStar)
+
+                    else:
+                        print "Negative Case Covered"
+                        pass
                     # print "Case already covered!"
             i+=1
         # DEBUG
