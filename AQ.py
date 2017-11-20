@@ -175,46 +175,57 @@ class AQ(object):
     def PrintComplexAsRuleNotNegated(self, _complex):
         rule = ""
         NumConditionsInRule = 0
-        print "Checking Complex: " + str(_complex)
         ConditionsInRule = []
 
         for entry in _complex:
             NegSet = list(set(entry).difference(set(self.DataSet.AttributeNames)))
             NewSet = []
-            print "Entry Being Checked: " + str(entry)
             for condition in NegSet:
                 condition = condition.replace("!", "")
                 NewSet.append(condition)
             NegSet = NewSet
 
-            print "Checking Attribute: " + str(entry[0])
             for AV in self.DataSet.attributeValues:
                 if AV[0] == entry[0]:
-                    ReversedCondition = set(AV[1]).difference(set(NegSet))
-                    ConditionsInRule.append(list(ReversedCondition))
+                    ReversedCondition = list(set(AV[1]).difference(set(NegSet)))
+                    ReversedCondition.insert(0, entry[0])
+                    ConditionsInRule.append(ReversedCondition)
+        return ConditionsInRule
 
-            print "Conditions in Rule: " + str(ConditionsInRule)
-
-            i = 0
-            for ListOfAttribueValues in ConditionsInRule:
-                if i > len(ListOfAttribueValues):
-                    break
-                else:
-                    for j in xrange(0, len(ListOfAttribueValues)):
-                        rule += "(" + str(entry[0]) + ", " + str(ListOfAttribueValues[j]) + ")"
-                        rule += " & "
-                i+=1
-        return rule
+    def NonNegatedRuleGenerator(self, ruleList, index):
+        for rule in ruleList:
+            for otherRule in ruleList:
+                if rule[0] != otherRule[0]: #if the two rules are affiliated with different attributes
+                    for condition in rule:
+                        if condition != rule[0]:
+                            decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[index])
+                            RuleAsString = "(" + str(rule[0]) + "," + str(condition) + ")" + " & " + "(" + str(otherRule[0]) + "," + str(condition) + ")" + "&"
+                            return RuleAsString
 
 
     def WriteRulesWithoutNegation(self):
         fileName = "datasets/my-data.without.negation.rul"
         with open(fileName, 'w') as output:
             for i in xrange(len(self.DataSet.ConceptNames)):
+                decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[i])
                 for _complex in self.ConceptStars[i].complexes:
-                    decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[i])
-                    print self.PrintComplexAsRuleNotNegated(_complex) + "->" + str(decisionTuple)
-                    output.write(self.PrintComplexAsRuleNotNegated(_complex) + "->" + str(decisionTuple) + "\n")
+
+                    ruleList = self.PrintComplexAsRuleNotNegated(_complex)
+                    ComboList = []
+                    for i in xrange(0, len(ruleList)):
+                        for j in xrange(0, len(ruleList[i])):
+                            if j != 0:
+                                newTuple = (ruleList[i][0], ruleList[i][j])
+                                ComboList.append(newTuple)
+
+                    for entry in ComboList:
+                        for OtherEntry in ComboList:
+                            if (entry[0] != OtherEntry[0]):
+                                RULE = str(entry) + " & "+ str(OtherEntry) + " -> " + str(decisionTuple)
+                                print RULE
+                                output.write(RULE + "\n")
+                        ComboList.remove(entry)
+
         print "Non-Negated Rules Complete!"
         return
 
@@ -226,8 +237,9 @@ class AQ(object):
         fileName = "datasets/my-data.with.negation.rul"
         with open(fileName, 'w') as output:
             for i in xrange(0, len(self.DataSet.ConceptNames)):
+                decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[i])
                 for _complex in self.ConceptStars[i].complexes:
-                    decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[i])
+
                     print self.PrintComplexAsRuleNegated(_complex) + " -> " + str(decisionTuple)
                     output.write(self.PrintComplexAsRuleNegated(_complex)+ " -> " + str(decisionTuple)+"\n")
         print "Negated Rules Complete!"
