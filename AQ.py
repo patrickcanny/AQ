@@ -33,26 +33,36 @@ class AQ(object):
     def IsCovered(self, Index, myStar):
         #TODO:Figure this thing out...for some reason it's not returning accurate coverings on multiple case complexes
         # print "Checking Coverage of Case " + str(Index) + " by " + str(myStar.complexes)
+        masterboolList = []
+        boolList = []
         for _complex in myStar.complexes:
-            print _complex
-            print Index
-            boolList = []
+            for i in range (0, 3):
+                pass
+                # print ""
+            # print "Starting New Complex"
+            # print _complex
+            # print Index
+
             for thing in _complex:
                 # print "Thing: " + str( thing)
                 indexOfThingBeingChecked = self.DataSet.AttributeNames.index(thing[0])
+                # print "DEBUGGING"
                 # print str(self.DataSet.dataTable[0][Index][indexOfThingBeingChecked])
                 # print thing[1].replace("!", "")
-                if self.DataSet.dataTable[0][Index][indexOfThingBeingChecked] != thing[1].replace("!", ""):
-                    print str(self.DataSet.dataTable[0][Index]) + thing[1].replace("!", "") + " caused the cover to return false"
-                    boolList.append(False)
-                    # print boolList
-                else:
+                if str(self.DataSet.dataTable[0][Index][indexOfThingBeingChecked] ) != str( thing[1].replace("!", "")):
+                    # print str(self.DataSet.dataTable[0][Index]) + thing[1].replace("!", "") + " caused the cover to return true"
                     boolList.append(True)
                     # print boolList
+                else:
+                    boolList.append(False)
+                    # print boolList
             # print "Congrats! " + str(thing) + " covers seed " + str(Index)
-            print boolList
-            if True not in boolList:
+            # print boolList
+            if False not in boolList:
+                print str(Index) + " appears to be covered by the current conceptstar"
+                masterboolList.append(True)
                 return True
+
         return False
 
     def findDifferences(self, seed, NegValues):
@@ -121,15 +131,17 @@ class AQ(object):
             return
 
         Concepts = getattr(self.DataSet, 'ConceptNames')
-        i = 0
+        indexofcconcept = 0
 
         for Concept in Concepts:
+            self.ConceptStars.append([])
             for h in range (0, 5):
                 print ""
             print "Starting New Concept " + str(Concept)
             # ConceptStar = Star()
             PositiveCases = []
             NegativeCases = []
+            ConceptCover = []
 
             for i in xrange(0, len(self.DataSet.dataTable[1])):
                 if self.DataSet.dataTable[1][i] == Concept:
@@ -198,25 +210,25 @@ class AQ(object):
                         else:
                             for i in CasesCovered:
                                 MasterCasesCoveredList.append(i)
-                                print MasterCasesCoveredList
-                if MasterCasesCoveredList == PositiveCases:
+                            print set(MasterCasesCoveredList)
+
+                if set(MasterCasesCoveredList) == set(PositiveCases):
                     print "Great Scott! All the Positive Cases Are Covered!"
+                    print "Complexes being added to cover: " + str(ConceptStar.complexes)
+                    ConceptCover.append(ConceptStar)
+                    print "Here is the current concept cover: " + str(ConceptCover)
+                    print "Adding The Final Cover for concept " + str(Concept) + " to The ConceptStars List"
+                    print indexofcconcept
+                    for star in ConceptCover:
+                        self.ConceptStars[indexofcconcept].append(star)
                     break
-            else:
-                print "Next Negative Case"
-
-
-                print "Adding The Above ConceptStar to The Cover because it only covers positive cases and no negatives"
-                self.ConceptStars.append(ConceptStar)
-
-                    # else:
-                    #     print "Negative Case Covered"
-                    #     pass
-                    # print "Case already covered!"
-            i+=1
-        # DEBUG
-        print self.ConceptStars[0].complexes
-        print self.ConceptStars[1].complexes
+                elif set(MasterCasesCoveredList) != set(PositiveCases):
+                    print "This ConceptStar is being added to the Cover: " + str(ConceptStar.complexes)
+                    ConceptCover.append(ConceptStar)
+                    print "Here is the current concept cover: " + str(ConceptCover)
+            indexofcconcept += 1
+        for entry in self.ConceptStars:
+                print str(entry)
 
 
     def NegativeCasesRemain(self, List, NegativeCases):
@@ -229,16 +241,17 @@ class AQ(object):
     def SimplifyRuleSet(self):
         print "Simplifying..."
         for Concept in self.ConceptStars:
-            for item in Concept.complexes:
-                for otherItem in Concept.complexes:
-                    if len(item) > len(otherItem):
-                        for condition in item:
-                            for othercondition in otherItem:
-                                if condition == othercondition:
-                                    try:
-                                        Concept.complexes.remove(item)
-                                    except:
-                                        continue
+            for star in Concept:
+                for item in star.complexes:
+                    for otherItem in star.complexes:
+                        if len(item) > len(otherItem):
+                            for condition in item:
+                                for othercondition in otherItem:
+                                    if condition == othercondition:
+                                        try:
+                                            star.complexes.remove(item)
+                                        except:
+                                            continue
 
 
 
@@ -282,25 +295,26 @@ class AQ(object):
     def WriteRulesWithoutNegation(self):
         fileName = "datasets/my-data.without.negation.rul"
         with open(fileName, 'w') as output:
-            for i in xrange(len(self.DataSet.ConceptNames)):
-                decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[i])
-                for _complex in self.ConceptStars[i].complexes:
+            for i in xrange(0, len(self.DataSet.ConceptNames)):
+                for star in self.ConceptStars[i]:
+                    for _complex in star.complexes:
+                        decisionTuple = (str(getattr(self.DataSet,'DecisionName')), str(getattr(self.DataSet, 'ConceptNames')[i]))
+                        print "Generating Rules for Decision " + str(decisionTuple)
+                        ruleList = self.PrintComplexAsRuleNotNegated(_complex)
+                        ComboList = []
+                        for i in xrange(0, len(ruleList)):
+                            for j in xrange(0, len(ruleList[i])):
+                                if j != 0:
+                                    newTuple = (ruleList[i][0], ruleList[i][j])
+                                    ComboList.append(newTuple)
 
-                    ruleList = self.PrintComplexAsRuleNotNegated(_complex)
-                    ComboList = []
-                    for i in xrange(0, len(ruleList)):
-                        for j in xrange(0, len(ruleList[i])):
-                            if j != 0:
-                                newTuple = (ruleList[i][0], ruleList[i][j])
-                                ComboList.append(newTuple)
-
-                    for entry in ComboList:
-                        for OtherEntry in ComboList:
-                            if (entry[0] != OtherEntry[0]):
-                                RULE = str(entry) + " & "+ str(OtherEntry) + " -> " + str(decisionTuple)
-                                print RULE
-                                output.write(RULE + "\n")
-                        ComboList.remove(entry)
+                        for entry in ComboList:
+                            for OtherEntry in ComboList:
+                                if (entry[0] != OtherEntry[0]):
+                                    RULE = str(entry) + " & "+ str(OtherEntry) + " -> " + str(decisionTuple)
+                                    print RULE
+                                    output.write(RULE + "\n")
+                            ComboList.remove(entry)
 
         print "Non-Negated Rules Complete!"
         return
@@ -313,10 +327,11 @@ class AQ(object):
         fileName = "datasets/my-data.with.negation.rul"
         with open(fileName, 'w') as output:
             for i in xrange(0, len(self.DataSet.ConceptNames)):
-                decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[i])
-                for _complex in self.ConceptStars[i].complexes:
-
-                    print self.PrintComplexAsRuleNegated(_complex) + " -> " + str(decisionTuple)
-                    output.write(self.PrintComplexAsRuleNegated(_complex)+ " -> " + str(decisionTuple)+"\n")
+                for star in self.ConceptStars[i]:
+                        for _complex in star.complexes:
+                            decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[i])
+                            print "Generating Rules for " + str(decisionTuple)
+                            print self.PrintComplexAsRuleNegated(_complex) + " -> " + str(decisionTuple)
+                            output.write(self.PrintComplexAsRuleNegated(_complex)+ " -> " + str(decisionTuple)+"\n")
         print "Negated Rules Complete!"
         return
