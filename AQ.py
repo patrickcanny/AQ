@@ -27,6 +27,9 @@ class AQ(object):
         #Essentially a List of the covers
         self.ConceptStars = []
 
+        self.negatedRules = []
+        self.nonNegatedRules = []
+
     # @function IsCovered
     # Calculates if a given complex covers a Star.
     # This Method Used Intermediately to Calculate Coverings of Partial Stars.
@@ -299,7 +302,6 @@ class AQ(object):
                 for star in self.ConceptStars[i]:
                     for _complex in star.complexes:
                         decisionTuple = (str(getattr(self.DataSet,'DecisionName')), str(getattr(self.DataSet, 'ConceptNames')[i]))
-                        print "Generating Rules for Decision " + str(decisionTuple)
                         ruleList = self.PrintComplexAsRuleNotNegated(_complex)
                         ComboList = []
                         for i in xrange(0, len(ruleList)):
@@ -312,8 +314,10 @@ class AQ(object):
                             for OtherEntry in ComboList:
                                 if (entry[0] != OtherEntry[0]):
                                     RULE = str(entry) + " & "+ str(OtherEntry) + " -> " + str(decisionTuple)
-                                    print RULE
-                                    output.write(RULE + "\n")
+                                    if RULE not in self.nonNegatedRules:
+                                        print RULE
+                                        self.nonNegatedRules.append(RULE)
+                                        output.write(RULE + "\n")
                             ComboList.remove(entry)
 
         print "Non-Negated Rules Complete!"
@@ -330,8 +334,10 @@ class AQ(object):
                 for star in self.ConceptStars[i]:
                         for _complex in star.complexes:
                             decisionTuple = (getattr(self.DataSet,'DecisionName'), getattr(self.DataSet, 'ConceptNames')[i])
-                            print "Generating Rules for " + str(decisionTuple)
-                            print self.PrintComplexAsRuleNegated(_complex) + " -> " + str(decisionTuple)
-                            output.write(self.PrintComplexAsRuleNegated(_complex)+ " -> " + str(decisionTuple)+"\n")
+                            rulestring = self.PrintComplexAsRuleNegated(_complex) + " -> " + str(decisionTuple)
+                            if rulestring not in self.negatedRules:
+                                self.negatedRules.append(rulestring)
+                                print rulestring
+                                output.write(rulestring + "\n")
         print "Negated Rules Complete!"
         return
