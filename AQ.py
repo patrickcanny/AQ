@@ -30,20 +30,30 @@ class AQ(object):
     # @function IsCovered
     # Calculates if a given complex covers a Star.
     # This Method Used Intermediately to Calculate Coverings of Partial Stars.
-    def IsCovered(self, IndexOfComplex, myStar):
-        # print "checking coverage of "+ str(myStar.complexes) + " by index "+str(IndexOfComplex)
+    def IsCovered(self, Index, myStar):
+        #TODO:Figure this thing out...for some reason it's not returning accurate coverings on multiple case complexes
+        # print "Checking Coverage of Case " + str(Index) + " by " + str(myStar.complexes)
         for _complex in myStar.complexes:
-            coveredByComplex = True;
-            for j in xrange(0, len(self.DataSet.AttributeNames)):
-                for k in xrange(0, len(_complex)):
-                    # print _complex[k]
-                    if _complex[k][0] == self.DataSet.AttributeNames[j] and _complex[k][1] == "!"+str(self.DataSet.AttributeNames[j]):
-                        coveredByComplex = False
-            if coveredByComplex:
-                # print "Index " + str(IndexOfComplex)+ " is covered!"
+            print _complex
+            print Index
+            boolList = []
+            for thing in _complex:
+                # print "Thing: " + str( thing)
+                indexOfThingBeingChecked = self.DataSet.AttributeNames.index(thing[0])
+                # print str(self.DataSet.dataTable[0][Index][indexOfThingBeingChecked])
+                # print thing[1].replace("!", "")
+                if self.DataSet.dataTable[0][Index][indexOfThingBeingChecked] != thing[1].replace("!", ""):
+                    print str(self.DataSet.dataTable[0][Index]) + thing[1].replace("!", "") + " caused the cover to return false"
+                    boolList.append(False)
+                    # print boolList
+                else:
+                    boolList.append(True)
+                    # print boolList
+            # print "Congrats! " + str(thing) + " covers seed " + str(Index)
+            print boolList
+            if True not in boolList:
                 return True
-            print "No Coverage, appending case"
-            return False
+        return False
 
     def findDifferences(self, seed, NegValues):
         dif = []
@@ -73,7 +83,6 @@ class AQ(object):
         print "Calculating Partial Star..."
 
         PartialStar = Star()
-
         NegValues = getattr(self.DataSet, 'dataTable')[0][NegativeCase]
         print "Selector: "+ str(NegativeCase)
 
@@ -81,9 +90,6 @@ class AQ(object):
         PartialStar = self.StarForACase(dif)
 
         print "PartialStar for seed " +str(seed) +" is: " + str(PartialStar.complexes)
-
-        # else:
-            # print "Case " + str(NegativeCase) + " is already covered!"
         return PartialStar
 
 
@@ -118,55 +124,107 @@ class AQ(object):
         i = 0
 
         for Concept in Concepts:
-            # print ""
-            # print""
-            # print "Starting New Concept..."
+            for h in range (0, 5):
+                print ""
+            print "Starting New Concept " + str(Concept)
             # ConceptStar = Star()
+            PositiveCases = []
+            NegativeCases = []
 
-            PositiveCases = getattr(self.DataSet, 'ConceptCases')
-            joined = list(itertools.chain.from_iterable(PositiveCases))
+            for i in xrange(0, len(self.DataSet.dataTable[1])):
+                if self.DataSet.dataTable[1][i] == Concept:
+                    NegativeCases.append(i)
+                else:
+                    PositiveCases.append(i)
+            #
+            # PositiveCases = getattr(self.DataSet, 'ConceptCases')
+            # joined = list(itertools.chain.from_iterable(PositiveCases))
+            #
+            # NegativeCaseSet = set(joined).difference(set(PositiveCases[i]))
+            # NegativeCases = list(NegativeCaseSet)
+            #
+            # #Debugging Tool
+            # temp = PositiveCases[i]
+            # PositiveCases[i] = NegativeCases
+            # NegativeCases = temp
+            print "Positive Cases"
+            print PositiveCases
+            print "Negative Cases"
+            print NegativeCases
 
-            NegativeCaseSet = set(joined).difference(set(PositiveCases[i]))
-            NegativeCases = list(NegativeCaseSet)
+            MasterCasesCoveredList =[]
+            for PositiveCase in PositiveCases:
+                for j in range(0,5):
+                    print ""
 
-            #Debugging Tool
-            # print "Positive Cases"
-            # print PositiveCases[i]
-            # print "Negative Case:"
-            # print NegativeCase
-
-            for PositiveCase in PositiveCases[i]:
+                print "Looking at Positive Case: " + str(PositiveCase)
                 ConceptStar = Star()
                 #Debugging Tool
                 # print "Seed: " + str(PositiveCase) + str(getattr(self.DataSet, 'dataTable')[0][PositiveCase])
 
                 seed = getattr(self.DataSet, 'dataTable')[0][PositiveCase]
+                print "Row Affiliated with that Positive Case: " + str(seed)
                 for NegativeCase in NegativeCases:
-                    if not self.IsCovered(PositiveCase, ConceptStar):
+                    PartialStar = self.CalculatePartialStar(seed, NegativeCase)
+                    PartialStar.SimplifyWith(MAXSTAR)
 
-                        PartialStar = self.CalculatePartialStar(seed, NegativeCase)
-                        PartialStar.SimplifyWith(MAXSTAR)
-
-                        if len(ConceptStar.complexes) == 0:
-                            print "Current Cover is Empty, adding the Partial Star"
-                            ConceptStar.complexes.append(PartialStar.complexes)
-
-                        else:
-                            print "This is Where Combination of Stars Occurs"
-                            ConceptStar.Combine(PartialStar)
-
-                        print "Adding a Star to The Cover"
-                        self.ConceptStars.append(ConceptStar)
+                    if len(ConceptStar.complexes) == 0:
+                        print "Current Cover is Empty, adding the Partial Star"
+                        ConceptStar.complexes.append(PartialStar.complexes)
 
                     else:
-                        print "Negative Case Covered"
-                        pass
+                        print "This is Where Combination of Stars Occurs"
+                        ConceptStar.Combine(PartialStar)
+                        ConceptStar.simplify()
+                        print "Current ConceptStar: " + str(ConceptStar.complexes)
+                        CasesCovered = []
+                        for i in PositiveCases:
+                            # print i
+                            if self.IsCovered(i, ConceptStar):
+                                # print "adding from positive cases"
+                                CasesCovered.append(i)
+
+                        for j in NegativeCases:
+                            if j != NegativeCase:
+                                if self.IsCovered(j, ConceptStar):
+                                    # print "adding from negative cases"
+                                    CasesCovered.append(j)
+
+                        print "Cases Covered: " + str(CasesCovered)
+
+
+                        if self.NegativeCasesRemain(CasesCovered, NegativeCases):
+                            pass
+                        else:
+                            for i in CasesCovered:
+                                MasterCasesCoveredList.append(i)
+                                print MasterCasesCoveredList
+                if MasterCasesCoveredList == PositiveCases:
+                    print "Great Scott! All the Positive Cases Are Covered!"
+                    break
+            else:
+                print "Next Negative Case"
+
+
+                print "Adding The Above ConceptStar to The Cover because it only covers positive cases and no negatives"
+                self.ConceptStars.append(ConceptStar)
+
+                    # else:
+                    #     print "Negative Case Covered"
+                    #     pass
                     # print "Case already covered!"
             i+=1
         # DEBUG
         print self.ConceptStars[0].complexes
         print self.ConceptStars[1].complexes
 
+
+    def NegativeCasesRemain(self, List, NegativeCases):
+        for entry in List:
+            if entry in NegativeCases:
+                print "Negative Cases Still Remain Covered! We Must Continue."
+                return True
+        return False
 
     def SimplifyRuleSet(self):
         print "Simplifying..."

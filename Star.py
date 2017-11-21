@@ -32,13 +32,25 @@ class Star(object):
         for elem in self.complexes:
             if elem not in new_complexes:
                 new_complexes.append(elem)
-        self.complexes = list(new_complexes)
+        new = []
+        for elem in new_complexes:
+            for otherelem in new_complexes:
+                if set(elem).issubset(set(otherelem)) and elem != otherelem and elem not in new:
+                    new.append(elem)
 
+        # print "NEW COMPLEXES??? " + str(new)
+        if len(new) > 0:
+            self.complexes =  new
+        else:
+            self.complexes = new_complexes
+
+    #Simple Helper function for adding a selector as a tuple
     def addSelector(self, AttributeName, NegativeValue):
         selector = (AttributeName, NegativeValue)
         if selector not in self.complexes:
             self.complexes.append(selector)
 
+    #Quick way to Trim stuff using MaxStar
     def SimplifyWith(self, MAXSTAR):
         print "Hit SimplifyWithMaxstar"
         if len(self.complexes) > MAXSTAR:
