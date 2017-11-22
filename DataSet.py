@@ -63,13 +63,15 @@ class DataSet(object):
             self.ConceptCases.append(DecisionsAffliated)
 
     def ChangeAttributeValues(self):
+        newlist = []
         for i in xrange(0, len(self.AttributeNames)):
             ListOfPossibleAttributeValues = []
             for row in self.dataTable[0]:
                 if row[i] not in ListOfPossibleAttributeValues:
                     ListOfPossibleAttributeValues.append(row[i])
             ValueToAppend = (self.AttributeNames[i], ListOfPossibleAttributeValues)
-            self.attributeValues.append(ValueToAppend)
+            newlist.append(ValueToAppend)
+            self.attributeValues = newlist
 
     #@function Dsicretize
     # If dataset is numerical, this function will convert it to a discretized version
@@ -111,7 +113,7 @@ class DataSet(object):
                                 row[i] = str(MinimumAttributeVal)+".."+str(MeanVal)
                             elif MeanVal <= float(row[i]) <= MaximumAttributeVal :
                                 row[i] = str(MeanVal)+".."+str(MaximumAttributeVal)
-
+        self.ChangeAttributeValues()
 
 
     #@function PrintProcessedData

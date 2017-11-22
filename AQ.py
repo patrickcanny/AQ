@@ -93,7 +93,7 @@ class AQ(object):
     # Finds The Value of a Partial Star, and returns that star as a Star object
     def CalculatePartialStar(self, seed, NegativeCase):
         print ""
-        print "Calculating Partial Star..."
+        # print "Calculating Partial Star..."
 
         PartialStar = Star()
         NegValues = getattr(self.DataSet, 'dataTable')[0][NegativeCase]
@@ -102,7 +102,7 @@ class AQ(object):
         dif = self.findDifferences(seed, NegValues)
         PartialStar = self.StarForACase(dif)
 
-        print "\nPartialStar for seed " +str(seed) +" is: " + str(PartialStar.complexes)
+        # print "\nPartialStar for seed " +str(seed) +" is: " + str(PartialStar.complexes)
         return PartialStar
 
 
@@ -152,17 +152,7 @@ class AQ(object):
                     PositiveCases.append(i)
                 else:
                     NegativeCases.append(i)
-            #
-            # PositiveCases = getattr(self.DataSet, 'ConceptCases')
-            # joined = list(itertools.chain.from_iterable(PositiveCases))
-            #
-            # NegativeCaseSet = set(joined).difference(set(PositiveCases[i]))
-            # NegativeCases = list(NegativeCaseSet)
-            #
-            # #Debugging Tool
-            # temp = PositiveCases[i]
-            # PositiveCases[i] = NegativeCases
-            # NegativeCases = temp
+
             print "Positive Cases"
             print PositiveCases
             print "Negative Cases"
@@ -179,23 +169,23 @@ class AQ(object):
                 # print "Seed: " + str(PositiveCase) + str(getattr(self.DataSet, 'dataTable')[0][PositiveCase])
 
                 seed = getattr(self.DataSet, 'dataTable')[0][PositiveCase]
-                print "Row Affiliated with that Positive Case: " + str(seed)
+                # print "Row Affiliated with that Positive Case: " + str(seed)
                 for NegativeCase in NegativeCases:
                     print "\n\n\n\n"
-                    print "New Negative Case Being Checked: " + str(NegativeCase)
+                    # print "New Negative Case Being Checked: " + str(NegativeCase)
                     PartialStar = self.CalculatePartialStar(seed, NegativeCase)
                     # print "About to Utilize MaxStar " + str(MAXSTAR)
                     PartialStar.SimplifyWith(MAXSTAR)
 
                     if len(ConceptStar.complexes) == 0:
-                        print "Current Cover is Empty, adding the Partial Star"
+                        # print "Current Cover is Empty, adding the Partial Star"
                         ConceptStar.complexes.append(PartialStar.complexes)
 
                     else:
                         # print "This is Where Combination of Stars Occurs"
                         ConceptStar.Combine(PartialStar)
                         ConceptStar.simplify()
-                        print "Current ConceptStar: " + str(ConceptStar.complexes)
+                        # print "Current ConceptStar: " + str(ConceptStar.complexes)
                         print""
                         CasesCovered = []
                         for i in PositiveCases:
@@ -238,11 +228,12 @@ class AQ(object):
                         print "This ConceptStar is being added to the Cover: " + str(ConceptStar.complexes)
                         ConceptCover.append(ConceptStar)
                         print "Here is the current concept cover: " + str(ConceptCover)
+
             indexofcconcept += 1
-        for i in xrange(0, len(self.ConceptStars)):
-            print "Covers for " + str(self.DataSet.ConceptNames[i])
-            for star in self.ConceptStars[i]:
-                print star.complexes
+        # for i in xrange(0, len(self.ConceptStars)):
+        #     print "Covers for " + str(self.DataSet.ConceptNames[i])
+        #     for star in self.ConceptStars[i]:
+        #         print star.complexes
 
 
     def NegativeCasesRemain(self, List, NegativeCases):
@@ -252,17 +243,22 @@ class AQ(object):
                 return True
         return False
 
+
     def SimplifyRuleSet(self):
         print "Simplifying..."
-        for Concept in self.ConceptStars:
-            for star in Concept:
+        for Cover in self.ConceptStars:
+            for star in Cover:
                 for item in star.complexes:
+                    # print "One Item: " + str(item)
                     for otherItem in star.complexes:
+                        # print "The Other Item That's Hopefully Shorter: " +str(otherItem)
                         if len(item) > len(otherItem):
+                            # print "Turns Out The Other Item Was shorter, so we should remove the larger item"
                             for condition in item:
                                 for othercondition in otherItem:
                                     if condition == othercondition:
                                         try:
+                                            # print "Removing Item: " + str(item)
                                             star.complexes.remove(item)
                                         except:
                                             continue
@@ -282,26 +278,32 @@ class AQ(object):
                 rule += " & "
         return rule
 
+
     #Takes a Complex
     #Inverts the Rules affiliated with that complex
     def PrintComplexAsRuleNotNegated(self, _complex):
+        # print "Non-negating Rule"
         rule = ""
         NumConditionsInRule = 0
         ConditionsInRule = []
 
         for entry in _complex:
+            # print entry
             NegSet = list(set(entry).difference(set(self.DataSet.AttributeNames)))
             NewSet = []
+            # print NegSet
             for condition in NegSet:
                 condition = condition.replace("!", "")
                 NewSet.append(condition)
             NegSet = NewSet
-
+            # print NegSet
             for AV in self.DataSet.attributeValues:
                 if AV[0] == entry[0]:
                     ReversedCondition = list(set(AV[1]).difference(set(NegSet)))
+                    # print ReversedCondition
                     ReversedCondition.insert(0, entry[0])
                     ConditionsInRule.append(ReversedCondition)
+                    # print "Conditions In Rule: " + str(ConditionsInRule)
         return ConditionsInRule
 
 
@@ -311,25 +313,38 @@ class AQ(object):
         with open(fileName, 'w') as output:
             for i in xrange(0, len(self.DataSet.ConceptNames)):
                 for star in self.ConceptStars[i]:
+                    # print star.complexes
                     for _complex in star.complexes:
+                        # print "Concept " + str(getattr(self.DataSet, 'ConceptNames')[i])
+                        # print "Complexes "+ str(star.complexes)
                         decisionTuple = (str(getattr(self.DataSet,'DecisionName')), str(getattr(self.DataSet, 'ConceptNames')[i]))
-                        ruleList = self.PrintComplexAsRuleNotNegated(_complex)
-                        ComboList = []
-                        for i in xrange(0, len(ruleList)):
-                            for j in xrange(0, len(ruleList[i])):
-                                if j != 0:
-                                    newTuple = (ruleList[i][0], ruleList[i][j])
-                                    ComboList.append(newTuple)
+                        ruleList = []
+                        # print "Complex to negate: " + str(_complex)
+                        for thing in _complex:
+                            myRules = self.PrintComplexAsRuleNotNegated(_complex)
+                            if myRules not in ruleList:
+                                ruleList.append(myRules)
+                        for entry in myRules:
+                            pass
+                        # print "Rule List for Complex: " + str(ruleList)
+                        for entry in ruleList:
 
-                        for entry in ComboList:
-                            for OtherEntry in ComboList:
-                                if (entry[0] != OtherEntry[0]):
-                                    RULE = str(entry) + " & "+ str(OtherEntry) + " -> " + str(decisionTuple)
-                                    if RULE not in self.nonNegatedRules:
-                                        print RULE
-                                        self.nonNegatedRules.append(RULE)
-                                        output.write(RULE + "\n")
-                            ComboList.remove(entry)
+
+                            for sublist in entry:
+                                for other in entry:
+
+                                        if len(entry) == 1:
+                                            RULE = "(" + str(sublist[0]) + ", " + str(sublist[1])+ ") -> " + str(decisionTuple)
+                                            print RULE
+                                            self.nonNegatedRules.append(RULE)
+                                            output.write(RULE + "\n")
+
+                                        if (sublist[0] != other[0]):
+                                            RULE  = "(" + str(sublist[0]) +", " + str(sublist[1]) + ") & ("+ str(other[0]) +", "+str(other[1])+ ") -> " + str(decisionTuple)
+                                            if RULE not in self.nonNegatedRules:
+                                                print RULE
+                                                self.nonNegatedRules.append(RULE)
+                                                output.write(RULE + "\n")
 
         print "Non-Negated Rules Complete!"
         return
@@ -338,7 +353,6 @@ class AQ(object):
     # Writes the rules to a file in negated format
     # working on figuring out how to transform this to non-negated format
     def WriteRulesWithNegation(self):
-        #TODO: Figure Out File Extension Stuff
         fileName = "datasets/my-data.with.negation.rul"
         with open(fileName, 'w') as output:
             for i in xrange(0, len(self.DataSet.ConceptNames)):
