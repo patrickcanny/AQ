@@ -1,4 +1,0 @@
-(C, not 7.2..11.0) -> ('D', 'very-high')
-(A, not 1.0..2.0) -> ('D', 'very-small')
-(B, not 1.0..2.3) & (A, not 1.0..2.0) -> ('D', 'very-small')
-(B, not 1.0..2.3) -> ('D', 'very-small')

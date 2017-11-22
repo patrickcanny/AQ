@@ -1,9 +1,0 @@
-< a a a d >
-!comment
-[ Capacity Noise Comfort Quality ] 
-5 high low low
-5 low med med
-5 high med med
-4 low low med
-4 low med low
-4 high med low

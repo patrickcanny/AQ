@@ -62,6 +62,7 @@ class DataSet(object):
             DecisionsAffliated = [i for i, x in enumerate(self.dataTable[1]) if x == concept]
             self.ConceptCases.append(DecisionsAffliated)
 
+    #Essentially acts as a setter for discretized data
     def ChangeAttributeValues(self):
         newlist = []
         for i in xrange(0, len(self.AttributeNames)):
@@ -75,6 +76,7 @@ class DataSet(object):
 
     #@function Dsicretize
     # If dataset is numerical, this function will convert it to a discretized version
+    # Currently, this just binarizes numerical attributes
     def Discretize(self):
         index = 0
         ListOfDescritizableIndexes = []

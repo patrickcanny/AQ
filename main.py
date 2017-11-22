@@ -13,7 +13,7 @@ checkTheFile = False
 for i in range(0,100):
     print " "
 
-#Welcom User!
+#Welcome User!
 print "Welcome to Patrick Canny's AQ Rule Inductor!"
 
 #While the bool from above is not true, continually prompt for a filename
@@ -55,12 +55,11 @@ while not checker:
     except:
         print "Sorry, but MaxStar must be and integer greater than 0!"
 
-
-
 #Actually run AQ...it's that easy.
 myAQ.runAQ(MaxStar)
 print "Ran AQ!"
 
+#Simplify your potentially messed up rules
 myAQ.SimplifyRuleSet()
 
 #Write all the rules from AQ to the required files

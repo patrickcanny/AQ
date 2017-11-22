@@ -34,40 +34,21 @@ class AQ(object):
     # Calculates if a given complex covers a Star.
     # This Method Used Intermediately to Calculate Coverings of Partial Stars.
     def IsCovered(self, Index, myStar):
-        #TODO:Figure this thing out...for some reason it's not returning accurate coverings on multiple case complexes
-        # print "Checking Coverage of Case " + str(Index) + " by " + str(myStar.complexes)
         masterboolList = []
         boolList = []
         for _complex in myStar.complexes:
-            for i in range (0, 3):
-                pass
-                # print ""
-            # print "Starting New Complex"
-            # print _complex
-            # print Index
-
             for thing in _complex:
-                # print "Thing: " + str( thing)
                 indexOfThingBeingChecked = self.DataSet.AttributeNames.index(thing[0])
-                # print "DEBUGGING"
-                # print str(self.DataSet.dataTable[0][Index][indexOfThingBeingChecked])
-                # print thing[1].replace("!", "")
                 if str(self.DataSet.dataTable[0][Index][indexOfThingBeingChecked] ) != str( thing[1].replace("!", "")):
-                    # print str(self.DataSet.dataTable[0][Index]) + thing[1].replace("!", "") + " caused the cover to return true"
                     boolList.append(True)
-                    # print boolList
                 else:
                     boolList.append(False)
-                    # print boolList
-            # print "Congrats! " + str(thing) + " covers seed " + str(Index)
-            # print boolList
             if False not in boolList:
-                # print str(Index) + " appears to be covered by the current conceptstar"
                 masterboolList.append(True)
                 return True
-
         return False
 
+    #Figure out the diferences between two given cases in the data table.
     def findDifferences(self, seed, NegValues):
         dif = []
         for i in xrange(0, len(seed)):
@@ -77,6 +58,7 @@ class AQ(object):
                 dif.append(" ")
         return dif
 
+    #Helper Method for adding selectors to each partial star.
     def StarForACase(self, dif):
         TheStarOfThisCase = Star()
         for i in xrange(0, len(dif)):
@@ -86,23 +68,15 @@ class AQ(object):
                 TheStarOfThisCase.addSelector(attribute, "!"+str(dif[i]))
             else:
                 continue
-                # print str(getattr(self.DataSet, 'AttributeNames')[position] ) + " value is shared between cases"
         return TheStarOfThisCase
 
     # @function CalculatePartialStar
     # Finds The Value of a Partial Star, and returns that star as a Star object
     def CalculatePartialStar(self, seed, NegativeCase):
-        print ""
-        # print "Calculating Partial Star..."
-
         PartialStar = Star()
         NegValues = getattr(self.DataSet, 'dataTable')[0][NegativeCase]
-        # print "Selector: "+ str(NegativeCase)
-
         dif = self.findDifferences(seed, NegValues)
         PartialStar = self.StarForACase(dif)
-
-        # print "\nPartialStar for seed " +str(seed) +" is: " + str(PartialStar.complexes)
         return PartialStar
 
 
@@ -124,7 +98,7 @@ class AQ(object):
         print "Data is Consistent"
         return True
 
-    #@function runAQ
+
     # The main driver of the whiole program is the AQ Algorithm
     # For every concept, the algorithm will generate a cover, appending that cover to ConceptStars
     # This is done through generation and comparison of partial stars.
@@ -133,142 +107,123 @@ class AQ(object):
         if not self.IsConsistent:
             return
 
+        #Loop Through Each Concept
         Concepts = getattr(self.DataSet, 'ConceptNames')
         indexofcconcept = 0
 
         for Concept in Concepts:
+            #ConceptStars keeps track of the rules, so we add a new list of rules for each concept
             self.ConceptStars.append([])
-            for h in range (0, 5):
-                print ""
+
+            #Debugging/ Sanity Check
             print "Starting New Concept " + str(Concept)
-            # ConceptStar = Star()
             PositiveCases = []
             NegativeCases = []
             ConceptCover = []
 
+            #Create the Sets of Positive and Negative Cases
             for i in xrange(0, len(self.DataSet.dataTable[1])):
-                print self.DataSet.dataTable[1][i]
                 if self.DataSet.dataTable[1][i] == Concept:
                     PositiveCases.append(i)
                 else:
                     NegativeCases.append(i)
 
+            #Sanity Check
             print "Positive Cases"
             print PositiveCases
             print "Negative Cases"
             print NegativeCases
 
+            #Create a Master cases Covered List to keep track of the indexes of cases that are already covered.
             MasterCasesCoveredList =[]
             for PositiveCase in PositiveCases:
-                for j in range(0,4):
-                    print ""
 
-                print "Seed: " + str(PositiveCase)
+                #Create a New star that is the conjunction of all partial stars for this positive case
                 ConceptStar = Star()
-                #Debugging Tool
-                # print "Seed: " + str(PositiveCase) + str(getattr(self.DataSet, 'dataTable')[0][PositiveCase])
 
                 seed = getattr(self.DataSet, 'dataTable')[0][PositiveCase]
-                # print "Row Affiliated with that Positive Case: " + str(seed)
+
+                # Loop Through all the negative cases using seed as a parameter for partial star generation.
                 for NegativeCase in NegativeCases:
-                    print "\n\n\n\n"
-                    # print "New Negative Case Being Checked: " + str(NegativeCase)
+                    print ""
                     PartialStar = self.CalculatePartialStar(seed, NegativeCase)
-                    # print "About to Utilize MaxStar " + str(MAXSTAR)
                     PartialStar.SimplifyWith(MAXSTAR)
 
+                    #Set the complexes of the Concept star to the partial star if it's emty initially
                     if len(ConceptStar.complexes) == 0:
-                        # print "Current Cover is Empty, adding the Partial Star"
                         ConceptStar.complexes.append(PartialStar.complexes)
 
                     else:
-                        # print "This is Where Combination of Stars Occurs"
+                        #Combine Stars
                         ConceptStar.Combine(PartialStar)
                         ConceptStar.simplify()
-                        # print "Current ConceptStar: " + str(ConceptStar.complexes)
-                        print""
+
+                        #Figure out what cases are currently covered by the Star
                         CasesCovered = []
                         for i in PositiveCases:
-                            # print i
                             if self.IsCovered(i, ConceptStar):
-                                # print "adding from positive cases"
                                 CasesCovered.append(i)
 
                         for j in NegativeCases:
                             if j != NegativeCase:
                                 if self.IsCovered(j, ConceptStar):
-                                    # print "adding from negative cases"
                                     CasesCovered.append(j)
 
-                        print "Cases Covered: " + str(CasesCovered)
-
-
+                        #If negative cases remain in the CasesCovered List, break
                         if self.NegativeCasesRemain(CasesCovered, NegativeCases):
-                            pass
+                            break
+                        #Otherwise, make sure to add the cases to the master cases covered list
                         else:
                             for i in CasesCovered:
                                 MasterCasesCoveredList.append(i)
-                            print set(MasterCasesCoveredList)
 
+                #This is done after every negative case is viewed, as to ensure MasterCasesCoveredList is accurate
+                #If the master cover is the same as the positive cases, add the star to the cover for this concept
                 if set(MasterCasesCoveredList) == set(PositiveCases):
-                    print "Great Scott! All the Positive Cases Are Covered!"
-                    print "Complexes being added to cover: " + str(ConceptStar.complexes)
                     ConceptCover.append(ConceptStar)
-                    print "Here is the current concept cover: " + str(ConceptCover)
-                    print "Adding The Final Cover for concept " + str(Concept) + " to The ConceptStars List"
-                    print indexofcconcept
+
+                    #For Every star in  the current cover
                     for star in ConceptCover:
+                        #output each star to the  conceptstars list (the master cover)
                         self.ConceptStars[indexofcconcept].append(star)
                     break
+
+                #If there are still discrepencies in PositiveCases and MasterCoverList
                 elif set(MasterCasesCoveredList) != set(PositiveCases):
-                    if self.NegativeCasesRemain(MasterCasesCoveredList, NegativeCases):
-                        print "Skipping adding this conceptstar to the cover because negatives remain."
-                        break
-                    else:
-                        print "This ConceptStar is being added to the Cover: " + str(ConceptStar.complexes)
-                        ConceptCover.append(ConceptStar)
-                        print "Here is the current concept cover: " + str(ConceptCover)
+                    #We still want to add the concept star to the concept cover, but not add it's entries to the master cover
+                    ConceptCover.append(ConceptStar)
 
+            #Increment the concept index
             indexofcconcept += 1
-        # for i in xrange(0, len(self.ConceptStars)):
-        #     print "Covers for " + str(self.DataSet.ConceptNames[i])
-        #     for star in self.ConceptStars[i]:
-        #         print star.complexes
 
-
+    #Check quickly if negative cases remain
     def NegativeCasesRemain(self, List, NegativeCases):
         for entry in List:
             if entry in NegativeCases:
-                print "Negative Cases Still Remain Covered! We Must Continue."
                 return True
         return False
 
 
+    #Make the ruleset simpler by removing rules that are supersets of other rules
     def SimplifyRuleSet(self):
         print "Simplifying..."
         for Cover in self.ConceptStars:
             for star in Cover:
                 for item in star.complexes:
-                    # print "One Item: " + str(item)
                     for otherItem in star.complexes:
-                        # print "The Other Item That's Hopefully Shorter: " +str(otherItem)
                         if len(item) > len(otherItem):
-                            # print "Turns Out The Other Item Was shorter, so we should remove the larger item"
                             for condition in item:
                                 for othercondition in otherItem:
                                     if condition == othercondition:
                                         try:
-                                            # print "Removing Item: " + str(item)
                                             star.complexes.remove(item)
                                         except:
                                             continue
 
-
-
+    #Printing Helper for Negated Rules
     def PrintComplexAsRuleNegated(self, _complex):
         rule = ""
         ConditionsInRule = 0
-
         for entry in _complex:
             for condition in entry:
                 NotCondition = entry[1].replace("!", "")
@@ -307,29 +262,22 @@ class AQ(object):
         return ConditionsInRule
 
 
-
+    #Helper for writing non-negated rules
     def WriteRulesWithoutNegation(self):
         fileName = "datasets/my-data.without.negation.rul"
         with open(fileName, 'w') as output:
             for i in xrange(0, len(self.DataSet.ConceptNames)):
                 for star in self.ConceptStars[i]:
-                    # print star.complexes
                     for _complex in star.complexes:
-                        # print "Concept " + str(getattr(self.DataSet, 'ConceptNames')[i])
-                        # print "Complexes "+ str(star.complexes)
                         decisionTuple = (str(getattr(self.DataSet,'DecisionName')), str(getattr(self.DataSet, 'ConceptNames')[i]))
                         ruleList = []
-                        # print "Complex to negate: " + str(_complex)
                         for thing in _complex:
                             myRules = self.PrintComplexAsRuleNotNegated(_complex)
                             if myRules not in ruleList:
                                 ruleList.append(myRules)
                         for entry in myRules:
                             pass
-                        # print "Rule List for Complex: " + str(ruleList)
                         for entry in ruleList:
-
-
                             for sublist in entry:
                                 for other in entry:
 
