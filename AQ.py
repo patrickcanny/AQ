@@ -62,7 +62,7 @@ class AQ(object):
             # print "Congrats! " + str(thing) + " covers seed " + str(Index)
             # print boolList
             if False not in boolList:
-                print str(Index) + " appears to be covered by the current conceptstar"
+                # print str(Index) + " appears to be covered by the current conceptstar"
                 masterboolList.append(True)
                 return True
 
@@ -97,12 +97,12 @@ class AQ(object):
 
         PartialStar = Star()
         NegValues = getattr(self.DataSet, 'dataTable')[0][NegativeCase]
-        print "Selector: "+ str(NegativeCase)
+        # print "Selector: "+ str(NegativeCase)
 
         dif = self.findDifferences(seed, NegValues)
         PartialStar = self.StarForACase(dif)
 
-        print "PartialStar for seed " +str(seed) +" is: " + str(PartialStar.complexes)
+        print "\nPartialStar for seed " +str(seed) +" is: " + str(PartialStar.complexes)
         return PartialStar
 
 
@@ -147,10 +147,11 @@ class AQ(object):
             ConceptCover = []
 
             for i in xrange(0, len(self.DataSet.dataTable[1])):
+                print self.DataSet.dataTable[1][i]
                 if self.DataSet.dataTable[1][i] == Concept:
-                    NegativeCases.append(i)
-                else:
                     PositiveCases.append(i)
+                else:
+                    NegativeCases.append(i)
             #
             # PositiveCases = getattr(self.DataSet, 'ConceptCases')
             # joined = list(itertools.chain.from_iterable(PositiveCases))
@@ -169,10 +170,10 @@ class AQ(object):
 
             MasterCasesCoveredList =[]
             for PositiveCase in PositiveCases:
-                for j in range(0,5):
+                for j in range(0,4):
                     print ""
 
-                print "Looking at Positive Case: " + str(PositiveCase)
+                print "Seed: " + str(PositiveCase)
                 ConceptStar = Star()
                 #Debugging Tool
                 # print "Seed: " + str(PositiveCase) + str(getattr(self.DataSet, 'dataTable')[0][PositiveCase])
@@ -180,7 +181,10 @@ class AQ(object):
                 seed = getattr(self.DataSet, 'dataTable')[0][PositiveCase]
                 print "Row Affiliated with that Positive Case: " + str(seed)
                 for NegativeCase in NegativeCases:
+                    print "\n\n\n\n"
+                    print "New Negative Case Being Checked: " + str(NegativeCase)
                     PartialStar = self.CalculatePartialStar(seed, NegativeCase)
+                    # print "About to Utilize MaxStar " + str(MAXSTAR)
                     PartialStar.SimplifyWith(MAXSTAR)
 
                     if len(ConceptStar.complexes) == 0:
@@ -188,10 +192,11 @@ class AQ(object):
                         ConceptStar.complexes.append(PartialStar.complexes)
 
                     else:
-                        print "This is Where Combination of Stars Occurs"
+                        # print "This is Where Combination of Stars Occurs"
                         ConceptStar.Combine(PartialStar)
                         ConceptStar.simplify()
                         print "Current ConceptStar: " + str(ConceptStar.complexes)
+                        print""
                         CasesCovered = []
                         for i in PositiveCases:
                             # print i
@@ -226,12 +231,18 @@ class AQ(object):
                         self.ConceptStars[indexofcconcept].append(star)
                     break
                 elif set(MasterCasesCoveredList) != set(PositiveCases):
-                    print "This ConceptStar is being added to the Cover: " + str(ConceptStar.complexes)
-                    ConceptCover.append(ConceptStar)
-                    print "Here is the current concept cover: " + str(ConceptCover)
+                    if self.NegativeCasesRemain(MasterCasesCoveredList, NegativeCases):
+                        print "Skipping adding this conceptstar to the cover because negatives remain."
+                        break
+                    else:
+                        print "This ConceptStar is being added to the Cover: " + str(ConceptStar.complexes)
+                        ConceptCover.append(ConceptStar)
+                        print "Here is the current concept cover: " + str(ConceptCover)
             indexofcconcept += 1
-        for entry in self.ConceptStars:
-                print str(entry)
+        for i in xrange(0, len(self.ConceptStars)):
+            print "Covers for " + str(self.DataSet.ConceptNames[i])
+            for star in self.ConceptStars[i]:
+                print star.complexes
 
 
     def NegativeCasesRemain(self, List, NegativeCases):

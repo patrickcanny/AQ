@@ -52,10 +52,9 @@ class Star(object):
 
     #Quick way to Trim stuff using MaxStar
     def SimplifyWith(self, MAXSTAR):
-        print "Hit SimplifyWithMaxstar"
-        if len(self.complexes) > MAXSTAR:
+        if len(self.complexes) > int(MAXSTAR):
             print "Reducing Complex Number with MaxStar"
-            self.complexes = self.complexes[:MAXSTAR]
+            self.complexes = self.complexes[:int(MAXSTAR)]
 
     def Combine(self, PartialStar):
         # self.complexes.append(PartialStar.complexes)
