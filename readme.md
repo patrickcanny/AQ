@@ -13,6 +13,6 @@ The AQ Algorithm is a systematic rule-induction algorithm that creates a cover f
 2. Type `make` to  initialize the program. You will be prompted for a fileName, and then again for a MaxStar value. The program will output the rules affiliated with your dataset in the folder `data/my-data.with.negation` and `data/my-data.without.negation`
 3. Type Command `make clean` to remove Python-generated machine code, as well as old rulesets.
 
-#Comments
+# Comments
 Ran into some issues down the stretch, resulting in some shortcomings. Issues in simplifying ruleset when creating a cover for each concept.
 Good learning experience!
