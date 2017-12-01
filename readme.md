@@ -14,5 +14,4 @@ The AQ Algorithm is a systematic rule-induction algorithm that creates a cover f
 3. Type Command `make clean` to remove Python-generated machine code, as well as old rulesets.
 
 # Comments
-Ran into some issues down the stretch, resulting in some shortcomings. Issues in simplifying ruleset when creating a cover for each concept.
-Good learning experience!
+Ran into some issues down the stretch, resulting in some shortcomings. Issues in simplifying ruleset when creating a cover for each concept, and general issues on very large datasets. Discovered the importance of writing clean code through this project. Good learning experience!
